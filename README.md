@@ -9,7 +9,7 @@
 
 ## 1. Introdução
 
-Containers Docker são, por padrão, *efêmeros**: quando removidos, todos os dados gerados internamente são perdidos permanentemente. Esse comportamento é adequado para aplicações *stateless* (como servidores web que apenas respondem requisições), porém inaceitável para bancos de dados, sistemas de arquivos e qualquer serviço que precise preservar estado entre reinicializações.
+Containers Docker são, por padrão, *efêmeros*: quando removidos, todos os dados gerados internamente são perdidos permanentemente. Esse comportamento é adequado para aplicações *stateless* (como servidores web que apenas respondem requisições), porém inaceitável para bancos de dados, sistemas de arquivos e qualquer serviço que precise preservar estado entre reinicializações.
 
 **Persistência de dados** é a capacidade de garantir que informações geradas por uma aplicação sobrevivam ao ciclo de vida do container. O mecanismo técnico que torna isso possível são os **Volumes Docker** — áreas de armazenamento gerenciadas separadamente do container, que existem independentemente de qualquer container estar rodando ou não.
 
