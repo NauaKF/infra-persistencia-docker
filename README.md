@@ -1,7 +1,9 @@
-# Persistência de Dados e Gerenciamento de Volumes em Containers Docker
+Persistência de Dados e Gerenciamento de Volumes em Containers Docker
 
 *Aluno:* Kauan Fernandes Oliveira
+
 *RA:* 210105
+
 *Disciplina:* Infraestrutura e Serviços de TI  
 *Instituição:* Facens  
 *Data:* 28 Maio de 2026  
@@ -9,17 +11,17 @@
 
 ---
 
-## 1. Introdução
+1. Introdução
 
 Containers Docker são, por padrão, *efêmeros*: quando removidos, todos os dados gerados internamente são perdidos permanentemente. Esse comportamento é adequado para aplicações *stateless* (como servidores web que apenas respondem requisições), porém inaceitável para bancos de dados, sistemas de arquivos e qualquer serviço que precise preservar estado entre reinicializações.
 
-**Persistência de dados** é a capacidade de garantir que informações geradas por uma aplicação sobrevivam ao ciclo de vida do container. O mecanismo técnico que torna isso possível são os **Volumes Docker** — áreas de armazenamento gerenciadas separadamente do container, que existem independentemente de qualquer container estar rodando ou não.
+*Persistência de dados* é a capacidade de garantir que informações geradas por uma aplicação sobrevivam ao ciclo de vida do container. O mecanismo técnico que torna isso possível são os *Volumes Docker* — áreas de armazenamento gerenciadas separadamente do container, que existem independentemente de qualquer container estar rodando ou não.
 
-### Containers Efêmeros
+Containers Efêmeros
 
 Por padrão, o sistema de arquivos de um container é temporário. Ao remover ou reiniciar um container, todos os arquivos criados dentro dele (logs, uploads, arquivos de banco de dados) são perdidos para sempre. Isso ocorre porque o Docker utiliza uma camada de escrita temporária sobre a imagem, que é descartada junto com o container.
 
-### Importância dos Volumes
+Importância dos Volumes
 
 Os volumes resolvem esse problema ao armazenar dados **fora** do ciclo de vida do container, em um local gerenciado pelo Docker no sistema host. Isso permite:
 
@@ -28,13 +30,11 @@ Os volumes resolvem esse problema ao armazenar dados **fora** do ciclo de vida d
 - Realizar backups e restaurações de forma independente
 - Atualizar containers sem perder dados
 
-### Objetivo da Atividade
+Objetivo da Atividade
 
 Esta atividade tem como objetivo desenvolver a capacidade de compreender, implementar e validar mecanismos de persistência de dados em ambientes containerizados utilizando Docker, aplicando conceitos de Named Volumes, Bind Mounts, backup, restauração e automação de infraestrutura.
 
----
-
-## 2. Ambiente Utilizado
+2. Ambiente Utilizado
 
 | Item | Versão / Informação |
 |------|-------------------|
@@ -46,13 +46,11 @@ Esta atividade tem como objetivo desenvolver a capacidade de compreender, implem
 | Swap | 2,6 GiB |
 | Virtualização | Oracle VirtualBox |
 
----
+3. Desenvolvimento da Atividade
 
-## 3. Desenvolvimento da Atividade
+Cenário 1 — Persistência de Dados com MySQL e Named Volume
 
-### Cenário 1 — Persistência de Dados com MySQL e Named Volume
-
-**Objetivo:** Validar que os dados sobrevivem à remoção do container.
+*Objetivo:* Validar que os dados sobrevivem à remoção do container.
 
 **Comandos utilizados:**
 
@@ -108,15 +106,13 @@ docker run -d \
 docker exec -it mysql-restaurado mysql -uroot -proot123 -e "USE teste; SELECT * FROM usuarios;"
 ```
 
-**Explicação técnica:** O flag `-v mysql-prod-data:/var/lib/mysql` mapeia o volume nomeado para o diretório interno de dados do MySQL. Ao remover o container, o volume permanece intacto no host gerenciado pelo Docker. Um novo container apontando para o mesmo volume encontra todos os dados preservados, demonstrando a separação entre o ciclo de vida do container e o ciclo de vida dos dados.
+*Explicação técnica:* A expressão: `-v mysql-prod-data:/var/lib/mysql` mapeia o volume nomeado para o diretório interno de dados do MySQL. Ao remover o container, o volume permanece intacto no host gerenciado pelo Docker. Um novo container apontando para o mesmo volume encontra todos os dados preservados, demonstrando a separação entre o ciclo de vida do container e o ciclo de vida dos dados.
 
----
+Cenário 2 — Backup e Restauração de Volume
 
-### Cenário 2 — Backup e Restauração de Volume
+*Objetivo:* Compreender estratégias de backup e recuperação de dados.
 
-**Objetivo:** Compreender estratégias de backup e recuperação de dados.
-
-**Comandos utilizados:**
+*Comandos utilizados:*
 
 ```bash
 # Backup físico via tar.gz
@@ -158,15 +154,13 @@ docker run -d \
 docker exec -it mysql-funcional mysql -uroot -proot123 -e "USE teste; SELECT * FROM usuarios;"
 ```
 
-**Explicação técnica:** Foram utilizados dois métodos de backup. O backup físico via `tar.gz` copia os arquivos binários do volume diretamente, sendo mais rápido porém dependente da versão do MySQL. O backup lógico via `mysqldump` gera um arquivo SQL portável com todos os comandos necessários para recriar a estrutura e os dados, sendo mais flexível e indicado para migrações entre versões.
+*Explicação técnica:* Foram utilizados dois métodos de backup. O backup físico via `tar.gz` copia os arquivos binários do volume diretamente, sendo mais rápido porém dependente da versão do MySQL. O backup lógico via `mysqldump` gera um arquivo SQL portável com todos os comandos necessários para recriar a estrutura e os dados, sendo mais flexível e indicado para migrações entre versões.
 
----
+Cenário 3 — Bind Mount e Desenvolvimento
 
-### Cenário 3 — Bind Mount e Desenvolvimento
+*Objetivo:* Compreender o funcionamento de Bind Mounts em ambientes de desenvolvimento.
 
-**Objetivo:** Compreender o funcionamento de Bind Mounts em ambientes de desenvolvimento.
-
-**Comandos utilizados:**
+*Comandos utilizados:*
 
 ```bash
 # Criar diretório local
@@ -196,9 +190,9 @@ ls -la
 cat novo.html
 ```
 
-**Explicação técnica:** O Bind Mount cria uma ligação direta entre um diretório do host e um diretório do container. Qualquer alteração feita no host é imediatamente visível no container e vice-versa, sem necessidade de reiniciar ou reconstruir a imagem. Isso é ideal para desenvolvimento, onde o desenvolvedor precisa ver as mudanças no código refletidas imediatamente na aplicação.
+*Explicação técnica:* O Bind Mount cria uma ligação direta entre um diretório do host e um diretório do container. Qualquer alteração feita no host é imediatamente visível no container e vice-versa, sem necessidade de reiniciar ou reconstruir a imagem. Isso é ideal para desenvolvimento, onde o desenvolvedor precisa ver as mudanças no código refletidas imediatamente na aplicação.
 
-**Diferença entre Bind Mount e Named Volume:**
+*Diferença entre Bind Mount e Named Volume:*
 
 | Característica | Bind Mount | Named Volume |
 |----------------|-----------|--------------|
@@ -207,13 +201,11 @@ cat novo.html
 | Portabilidade | Baixa | Alta |
 | Performance | Média | Alta |
 
----
+Cenário 4 — Compartilhamento de Dados Entre Containers
 
-### Cenário 4 — Compartilhamento de Dados Entre Containers
+*Objetivo:* Validar comunicação e compartilhamento de dados entre containers via volume.
 
-**Objetivo:** Validar comunicação e compartilhamento de dados entre containers via volume.
-
-**Comandos utilizados:**
+*Comandos utilizados:*
 
 ```bash
 # Criar volume compartilhado
@@ -243,15 +235,13 @@ docker run --rm \
   cat /dados/log.txt
 ```
 
-**Explicação técnica:** Dois containers independentes montam o mesmo volume em seus sistemas de arquivos internos. O container produtor escreve entradas de log a cada 5 segundos, enquanto o container consumidor lê o arquivo em tempo real. Isso demonstra que volumes Docker funcionam como um sistema de arquivos compartilhado entre containers, sem necessidade de comunicação via rede.
+*Explicação técnica:* Dois containers independentes montam o mesmo volume em seus sistemas de arquivos internos. O container produtor escreve entradas de log a cada 5 segundos, enquanto o container consumidor lê o arquivo em tempo real. Isso demonstra que volumes Docker funcionam como um sistema de arquivos compartilhado entre containers, sem necessidade de comunicação via rede.
 
----
+Cenário 5 — Automação de Backup com Script Bash
 
-### Cenário 5 — Automação de Backup com Script Bash
+*Objetivo:* Introduzir automação operacional em infraestrutura com script de backup.
 
-**Objetivo:** Introduzir automação operacional em infraestrutura com script de backup.
-
-**Script backup.sh:**
+*Script backup.sh:*
 
 ```bash
 #!/bin/bash
@@ -287,18 +277,16 @@ echo "Backup finalizado!"
 ls -lh $BACKUP_DIR/
 ```
 
-**Execução:**
+*Execução:*
 
 ```bash
 chmod +x scripts/backup.sh
 bash scripts/backup.sh
 ```
 
-**Explicação técnica:** O script automatiza o processo completo de backup, eliminando a necessidade de intervenção humana. Ele realiza tanto o backup físico (tar.gz do volume) quanto o backup lógico (mysqldump), gera um log de auditoria com timestamps e remove automaticamente backups antigos para economizar espaço em disco.
+*Explicação técnica:* O script automatiza o processo completo de backup, eliminando a necessidade de intervenção humana. Ele realiza tanto o backup físico (tar.gz do volume) quanto o backup lógico (mysqldump), gera um log de auditoria com timestamps e remove automaticamente backups antigos para economizar espaço em disco.
 
----
-
-## 4. Evidências
+4. Evidências
 
 As evidências de cada cenário estão organizadas na pasta `screenshots/`:
 
@@ -308,9 +296,7 @@ As evidências de cada cenário estão organizadas na pasta `screenshots/`:
 - `screenshots/cenario4/` — Volume compartilhado entre containers produtor e consumidor
 - `screenshots/cenario5/` — Scripts de automação e execução do backup
 
----
-
-## 5. Problemas Encontrados
+5. Problemas Encontrados
 
 | Problema | Causa | Solução |
 |----------|-------|---------|
@@ -319,24 +305,20 @@ As evidências de cada cenário estão organizadas na pasta `screenshots/`:
 | Pastas vazias não apareciam no GitHub | GitHub não versiona pastas vazias | Adicionado arquivo `.gitkeep` em cada pasta |
 | Container MySQL demorava a inicializar | MySQL precisa de tempo para iniciar | Aguardado 15 segundos antes de conectar |
 
----
-
-## 6. Conclusões
+6. Conclusões
 
 Esta atividade demonstrou na prática a importância da persistência de dados em ambientes containerizados. Os principais aprendizados foram:
 
-- **Containers são efêmeros por natureza** — sem volumes, todos os dados são perdidos ao remover o container
-- **Named Volumes** são a solução recomendada para produção, oferecendo alta performance e gerenciamento pelo Docker
-- **Bind Mounts** são ideais para desenvolvimento, permitindo que alterações no código sejam refletidas imediatamente no container
-- **Backup e restauração** são processos críticos que devem ser automatizados em ambientes reais
-- **Volumes compartilhados** permitem comunicação eficiente entre containers sem necessidade de rede
-- **Automação via scripts Bash** elimina erros humanos e garante consistência nas operações de infraestrutura
+- *Containers são efêmeros por natureza* — sem volumes, todos os dados são perdidos ao remover o container
+- *Named Volumes* são a solução recomendada para produção, oferecendo alta performance e gerenciamento pelo Docker
+- *Bind Mounts* são ideais para desenvolvimento, permitindo que alterações no código sejam refletidas imediatamente no container
+- *Backup e restauração* são processos críticos que devem ser automatizados em ambientes reais
+- *Volumes compartilhados* permitem comunicação eficiente entre containers sem necessidade de rede
+- *Automação via scripts Bash* elimina erros humanos e garante consistência nas operações de infraestrutura
 
 A separação entre o ciclo de vida do container e o ciclo de vida dos dados é um conceito fundamental em DevOps e Cloud Computing, garantindo alta disponibilidade e recuperação de desastres em ambientes de produção.
 
----
-
-## 7. Estrutura do Repositório
+7. Estrutura do Repositório
 
 ```
 infra-persistencia-docker/
